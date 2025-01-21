@@ -15,10 +15,14 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 class ReservationsExport implements FromCollection, WithHeadings, WithMapping, WithStyles, ShouldAutoSize
 {
     private $userId;
+    private $startDate;
+    private $endDate;
 
-    public function __construct($userId = null)
+    public function __construct($userId = null, $startDate = null, $endDate = null)
     {
         $this->userId = $userId;
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
     }
 
     /**
@@ -26,11 +30,14 @@ class ReservationsExport implements FromCollection, WithHeadings, WithMapping, W
      */
     public function collection()
     {
-        $query = Reservation::with('user.idBadges')
-            ->orderBy('reservation_date', 'desc'); // Urutkan berdasarkan reservation_date descending
+        $query = Reservation::with('user.idBadges')->orderBy('reservation_date', 'desc');
 
         if ($this->userId) {
             $query->where('user_id', $this->userId);
+        }
+
+        if ($this->startDate && $this->endDate) {
+            $query->whereBetween('reservation_date', [$this->startDate, $this->endDate]);
         }
 
         return $query->get();

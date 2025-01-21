@@ -2,6 +2,14 @@
 
 @section('content')
 <section class="section dashboard">
+    <style>
+        input#dateRange,
+        input#dateRange:focus {
+            border: none;
+            outline: none;
+            color: white;
+        }
+    </style>
     <div class="row">
         @if (session('success'))
         <div class="alert alert-success">
@@ -14,65 +22,37 @@
         @endif
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Manage Reservations</h5>
-                <button class="btn btn-sm btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#reservationModal">Add Reservation</button>
+                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3">
+                    <h5 class="card-title">Manage Reservations</h5>
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#reservationModal">
+                        Add Reservation
+                    </button>
+                    <div class="mt-4 mt-md-0 ms-md-auto" style="width: max-content;">
+                        <label for="dateRange" class="btn btn-sm btn-light text-dark fw-600 d-flex align-items-center px-4">
+                            <input placeholder="Pick date range" class="bg-transparent text-dark fw-600 cursor-pointer"
+                                id="dateRange" />
+                            <i class="bi bi-calendar-event-fill"></i>
+                        </label>
+                        <input type="hidden" id="start_date">
+                        <input type="hidden" id="end_date">
+                    </div>
+                </div>
 
                 <div class="table-responsive">
-                    <table class="table datatable">
+                    <table class="table" id="reservationTable">
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <th>Name</th>
-                                <th>Reservation/PO</th>
-                                <th>Badge</th>
                                 <th>Reservation Date</th>
+                                <th>Reservation/PO</th>
                                 <th>Item</th>
                                 <th>Quantity</th>
+                                <th>Name</th>
+                                <th>Badge</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach ($reservations as $reservation)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $reservation->user->name }}</td>
-                                <td>{{ $reservation->no_reservation }}</td>
-                                <td>
-                                    @foreach($reservation->user->idBadges as $badge)
-                                    <span class="badge bg-info">{{ $badge->badge_name }}</span>
-                                    @endforeach
-                                </td>
-                                <td>{{ $reservation->reservation_date }}</td>
-                                <td>{{ $reservation->item }}</td>
-                                <td>{{ $reservation->quantity }}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-warning {{ $reservation->user_id !== auth()->id() ? 'disabled' : '' }}" data-bs-toggle="modal" data-bs-target="#reservationModalEdit{{ $reservation->id }}">Edit</button>
-                                    <button class="btn btn-sm btn-danger {{ $reservation->user_id !== auth()->id() ? 'disabled' : '' }}" data-bs-toggle="modal" data-bs-target="#reservationModalDelete{{ $reservation->id }}">Delete</button>
-                                    <div class="modal fade" id="reservationModalDelete{{ $reservation->id }}" tabindex="-1" aria-labelledby="reservationModalDeleteLabel{{ $reservation->id }}" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="reservationModalDeleteLabel{{ $reservation->id }}">Delete Reservation</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <p>Are you sure you want to delete this reservation?</p>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                    <form action="{{ route('reservation.destroy', $reservation->id) }}" method="POST">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button class="btn btn-sm btn-danger">Delete</button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>

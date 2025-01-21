@@ -36,14 +36,14 @@
         </a>
         <ul id="exports-nav" class="nav-content collapse {{ request()->routeIs('reservation.export.all', 'reservation.export.user') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
           <li>
-            <a href="{{ route('reservation.export.all') }}" class="{{ request()->routeIs('reservation.export.all') ? 'active' : '' }}">
-              <i class="bi bi-circle"></i><span>Export Reservation</span>
-            </a>
+              <a href="#" id="exportAllBtn">
+                  <i class="bi bi-circle"></i><span>Export All Reservation</span>
+              </a>
           </li>
           <li>
-            <a href="{{ route('reservation.export.user') }}" class="{{ request()->routeIs('reservation.export.user') ? 'active' : '' }}">
-              <i class="bi bi-circle"></i><span>Export User Reservation</span>
-            </a>
+              <a href="#" id="exportUserBtn">
+                  <i class="bi bi-circle"></i><span>Export My Reservation</span>
+              </a>
           </li>
         </ul>
       </li><!-- End Export Nav -->

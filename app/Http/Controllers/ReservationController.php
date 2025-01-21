@@ -14,11 +14,28 @@ use Maatwebsite\Excel\Facades\Excel;
 class ReservationController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $reservations = Reservation::with(['user.idBadges'])->orderBy('reservation_date', 'desc')->get();
+        $query = Reservation::with(['user.idBadges'])->orderBy('reservation_date', 'desc');
 
-        return view('reservation.index', ['reservations' => $reservations, 'title' => 'Reservations']);
+        // Gunakan tanggal default jika tidak ada input
+        $startDate = $request->input('start_date', now()->startOfYear()->format('Y-m-d'));
+        $endDate = $request->input('end_date', now()->endOfYear()->format('Y-m-d'));
+
+        $query->whereBetween('reservation_date', [$startDate, $endDate]);
+
+        $reservations = $query->get();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'data' => $reservations
+            ]);
+        }
+
+        return view('reservation.index', [
+            'reservations' => $reservations,
+            'title' => 'Reservations',
+        ]);
     }
 
     public function store(Request $request)
@@ -76,13 +93,19 @@ class ReservationController extends Controller
         return redirect()->back()->with('warning', 'Reservation deleted successfully.');
     }
 
-    public function exportAll()
+    public function exportAll(Request $request)
     {
-        return Excel::download(new ReservationsExport(), 'all_reservations.xlsx');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        return Excel::download(new ReservationsExport(null, $startDate, $endDate), 'all_reservations.xlsx');
     }
 
-    public function exportUser()
+    public function exportUser(Request $request)
     {
-        return Excel::download(new ReservationsExport(Auth::id()), 'my_reservations.xlsx');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        return Excel::download(new ReservationsExport(Auth::id(), $startDate, $endDate), 'my_reservations.xlsx');
     }
 }
